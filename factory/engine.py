@@ -1,32 +1,22 @@
-import asyncio
 from aiomultiprocess import Worker
-from .task import Task
-from .settings import settings
+import asyncio
 
 
 async def run_worker(task_msg, config):
-    task = Task(task_msg, config)
+    task = MetaTask(task_msg, config)
     await task.run()
     return task.get_fin_info()
 
 
-class TaskManager:
-    def __init__(self, engine, task, queue):
-        self.engine = engine
-        self.task_msg = task
-        self.result_queue = queue
-
-    async def run(self):
-        w = Worker(target=run_worker, args=(self.task_msg, self.engine.settings))
-        r = await w
-        await self.result_queue.put({'task_mngr': self, 'result': r})
-
-    def __eq__(self, other):
-        return self.task_msg.get('task_id') == other.task_msg.get('task_id')
-
 class Engine:
-    def __init__(self):
+    '''main process run the whole service from here'''
+    def __init__(self, settings, connector):
         self.settings = settings
+        # self.connector = connector
+        self.feed = settings.FEED_PIPELINE
+        self.sream = settings.STREAM_PIPELINE
+        self.streem_queue = asyncio.Queue()
+        self.running_tasks = []
 
 
     async def run(self):
@@ -39,7 +29,6 @@ class Engine:
 
             task_msg = msg.value
             await self.task_queue.put(1)
-            logger.info('task received with task_id "{}"'.format(jp.search('task_id', task_msg)))
             task_mngr = TaskManager(
                 self,
                 task_msg,
@@ -54,5 +43,17 @@ class Engine:
             self.running_tasks.remove(result.get('task_mngr'))
             await self.task_queue.get()
             await self.connector.send_to_topics(result.get('result'))
-            # print(result.keys())
-            logger.info('task finished')
+
+class TaskManager:
+    def __init__(self, engine, task, queue):
+        self.engine = engine
+        self.task_msg = task
+        self.result_queue = queue
+
+    async def run(self):
+        w = Worker(target=run_worker, args=(self.task_msg, self.engine.settings))
+        r = await w
+        await self.result_queue.put({'task_mngr': self, 'result': r})
+
+    def __eq__(self, other):
+        return self.task_msg.get('task_id') == other.task_msg.get('task_id')
