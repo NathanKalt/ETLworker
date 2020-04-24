@@ -12,7 +12,7 @@ BOOTSTRAP_SERVERS = ['127.0.0.1:9092']
 FEED_TOPIC = 'feed'
 STREAM_TOPIC = 'stream'
 
-# validators settings
+#validators settings
 
 
 # workers settings

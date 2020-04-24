@@ -14,7 +14,7 @@ class StreamPipeline(metaclass=MetaPipeline):
     @staticmethod
     async def generate_whatever():
         while True:
-            yield {'mock': random.randrange(0,1000)}
+            yield {'mock': random.randrange(0, 1000)}
             await asyncio.sleep(0.1)
 
 
