@@ -24,10 +24,12 @@ class StreamPipeline(metaclass=MetaPipeline):
 
 class KafkaStreamPipeline(StreamPipeline):
 
-    def __init__(self, topic=None):
-        self.pipeline = KafkaConnector(topic)
+    def __init__(self):
+        super().__init__()
 
-    async def start(self):
+    async def start(self, topic, queue):
+        self.pipeline = KafkaConnector(topic)
+        self.stream_queue = queue
         await self.pipeline.start_producer()
 
     async def emit(self, msg):

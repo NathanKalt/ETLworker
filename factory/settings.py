@@ -1,7 +1,4 @@
-import sys
 import os
-from importlib import import_module
-from os.path import join, abspath, dirname
 
 
 # Which pipelines to use
@@ -11,14 +8,17 @@ STREAM_PIPELINE = 'factory.pipelines.streampipelines.KafkaStreamPipeline'
 # Kafka configs for kafka pipelines
 BOOTSTRAP_SERVERS = ['127.0.0.1:9092']
 FEED_TOPIC = 'feed'
+FEED_QUEUE_MAX_SIZE = 100
 STREAM_TOPIC = 'stream'
 
-#validators settings
+# WORKERS SETTINGS
+#reasonable to have as many as cpy cores or less
+AMOUNT_OF_WORKERS = os.cpu_count()
 
 
-# workers settings
-AMOUNT_OF_WORKERS = '4'
+MIDDLEWARES = [
 
+]
 
 
 

@@ -22,12 +22,14 @@ class FeedPipeline(metaclass=MetaPipeline):
 
 class KafkaFeedPipeline(FeedPipeline):
 
-    def __init__(self, topic=None, queue=None):
+    def __init__(self):
         super().__init__()
+        self.pipeline = None
+        self.feed_queue = None
+
+    async def start(self, topic, queue):
         self.pipeline = KafkaConnector(topic)
         self.feed_queue = queue
-
-    async def start(self):
         await self.pipeline.start_consumer()
         try:
             # Consume messages

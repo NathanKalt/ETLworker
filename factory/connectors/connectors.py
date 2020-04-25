@@ -26,11 +26,12 @@ class KafkaConnector(BaseConnector):
     '''obiously a connector for kafka'''
 
     def __init__(self, topic):
+        super().__init__()
         self.consumer = AIOKafkaConsumer(
             topic,
-            loop = asyncio.get_event_loop(),
-            bootstrap_servers = settings.BOOTSTRAP_SERVERS,
-            value_deserializer = lambda m: json.loads(m.decode('utf8')),
+            loop=asyncio.get_event_loop(),
+            bootstrap_servers=settings.BOOTSTRAP_SERVERS,
+            value_deserializer=lambda m: json.loads(m.decode('utf8')),
             auto_offset_reset='earliest'
         )
 
