@@ -11,18 +11,21 @@ class FeedPipeline(metaclass=MetaPipeline):
     always has the start method to run proper connector and receive data
     '''
     def __init__(self):
-        self.queue
         pass
 
     async def start(self):
         pass
 
+    async def stop(self):
+        pass
+
 
 class KafkaFeedPipeline(FeedPipeline):
 
-    def __init__(self, topic=None):
+    def __init__(self, topic=None, queue=None):
+        super().__init__()
         self.pipeline = KafkaConnector(topic)
-
+        self.feed_queue = queue
 
     async def start(self):
         await self.pipeline.start_consumer()
@@ -33,6 +36,8 @@ class KafkaFeedPipeline(FeedPipeline):
                       msg.key, msg.value, msg.timestamp)
         finally:
             # Will leave consumer group; perform autocommit if enabled.
-            await self.consumer.stop()
+            await self.pipeline.consumer.stop()
 
+    async def stop(self):
+        await self.pipeline.consumer.stop()
 
