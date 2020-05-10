@@ -1,7 +1,7 @@
-from factory.workers.worker import MetaWorker
+from factory.utils.utils import get_middleware_chain
 
 
-class FactoryWorker(metaclass=MetaWorker):
+class FactoryWorker():
     def __init__(self):
         pass
 
@@ -15,14 +15,30 @@ class FactoryWorker(metaclass=MetaWorker):
         '''
         return iter()
 
-    def connect_to_queue(self):
-        '''in general case read from engines feed queue'''
-
-    def get_result(self):
+    def stop(self):
         return
 
-class ProcessingWorker(FactoryWorker):
+class SampleWorker(FactoryWorker):
     '''in case with kafka '''
-    def __init__(self, settings):
+    def __init__(self, feed, stream, settings):
         self.settings = settings
-        pass
+        self.feed_queue = feed
+        self.stream_queue = stream
+        self.mw_chain = get_middleware_chain(self.settings)
+        print(self.mw_chain)
+
+    async def process(self, m):
+        for mw_method in self.mw_chain:
+            m = mw_method.process(m)
+
+        return m
+
+    async def start(self):
+        print('started')
+        while True:
+            m = await self.feed_queue.get()
+            if m is None: break
+            m = await self.process(m)
+            await self.stream_queue.put(m)
+            print('processed', m)
+

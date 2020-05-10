@@ -1,0 +1,35 @@
+---
+version: '3.7'
+services:
+  zookeeper:
+    container_name: zookeeper
+    restart: always
+    image: wurstmeister/zookeeper
+    network_mode: host
+    volumes:
+      - /data/zk_data:/var/lib/zookeeper/data
+      - /data/zk_logs:/var/lib/zookeeper/log
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: broker
+    volumes:
+      - /data/kafka_data:/var/lib/kafka/data
+    restart: always
+    network_mode: host
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ZOOKEEPER_CONNECT: 127.0.0.1:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://127.0.0.1:9092,
+      KAFKA_LISTENERS: INSIDE://127.0.0.1:9092,
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_CREATE_TOPICS: "logs:1:1,FEED:1:1,STREAM:1:1"

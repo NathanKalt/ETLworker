@@ -32,10 +32,10 @@ class KafkaFeedPipeline(FeedPipeline):
         self.feed_queue = queue
         await self.pipeline.start_consumer()
         try:
-            # Consume messages
             async for msg in self.pipeline.consumer:
-                print("consumed: ", msg.topic, msg.partition, msg.offset,
-                      msg.key, msg.value, msg.timestamp)
+                await self.feed_queue.put(msg.value)
+                print(msg.value)
+
         finally:
             # Will leave consumer group; perform autocommit if enabled.
             await self.pipeline.consumer.stop()

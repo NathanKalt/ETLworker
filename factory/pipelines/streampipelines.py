@@ -31,9 +31,10 @@ class KafkaStreamPipeline(StreamPipeline):
         self.pipeline = KafkaConnector(topic)
         self.stream_queue = queue
         await self.pipeline.start_producer()
-
-    async def emit(self, msg):
-        await self.start()
-        for send_msg in msg:
-            await self.pipeline.producer.send(settings.STREAM_TOPIC, value=send_msg)
+        while True:
+            m = await self.stream_queue.get()
+            if m is None: break
+            print('sending_msg', m)
+            await self.pipeline.producer.send(settings.STREAM_TOPIC, value=m)
             await self.pipeline.producer.flush()
+

@@ -32,7 +32,6 @@ class KafkaConnector(BaseConnector):
             loop=asyncio.get_event_loop(),
             bootstrap_servers=settings.BOOTSTRAP_SERVERS,
             value_deserializer=lambda m: json.loads(m.decode('utf8')),
-            auto_offset_reset='earliest'
         )
 
         self.producer = AIOKafkaProducer(
