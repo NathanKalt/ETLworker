@@ -9,5 +9,5 @@ i = 0
 while True:
     i+=1
     producer.send('FEED', {'data': i})
-    sleep(1)
+    # sleep(1)
 

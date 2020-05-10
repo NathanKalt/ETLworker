@@ -25,7 +25,6 @@ class SampleWorker(FactoryWorker):
         self.feed_queue = feed
         self.stream_queue = stream
         self.mw_chain = get_middleware_chain(self.settings)
-        print(self.mw_chain)
 
     async def process(self, m):
         for mw_method in self.mw_chain:
@@ -40,5 +39,6 @@ class SampleWorker(FactoryWorker):
             if m is None: break
             m = await self.process(m)
             await self.stream_queue.put(m)
-            print('processed', m)
+            # print('processed', m)
+            # return m
 
