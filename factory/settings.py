@@ -21,7 +21,7 @@ WORKER_TYPE = 'factory.workers.workers.SampleWorker'
 
 MIDDLEWARES = [
     'factory.middlewares.middlewares.SampleMiddleware',
-    'factory.middlewares.middlewares.SampleMiddleware_two',
+    'factory.middlewares.middlewares.SampleMiddlewareTwo',
 ]
 
 

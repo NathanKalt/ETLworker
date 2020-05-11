@@ -21,7 +21,7 @@ class SampleMiddleware(BaseMiddleware):
         return m
 
 
-class SampleMiddleware_two(BaseMiddleware):
+class SampleMiddlewareTwo(BaseMiddleware):
 
     def __init__(self):
         super().__init__()
