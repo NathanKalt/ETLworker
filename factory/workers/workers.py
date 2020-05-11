@@ -1,4 +1,8 @@
 from factory.utils.utils import get_middleware_chain
+import logging
+
+
+logger = logging.getLogger('AioETL')
 
 
 class FactoryWorker():
@@ -29,11 +33,13 @@ class SampleWorker(FactoryWorker):
     async def process(self, m):
         for mw_method in self.mw_chain:
             m = mw_method.process(m)
+            logger.info('{} processing result {}'.format(mw_method.__class__.__name__, m))
+            # print(m)
 
         return m
 
     async def start(self):
-        print('started')
+        logger.info('Worker {} started'.format(self.__class__.__name__))
         while True:
             m = await self.feed_queue.get()
             if m is None: break

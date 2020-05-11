@@ -1,8 +1,8 @@
 from factory.pipelines.pipeline import MetaPipeline
 from factory.connectors.connectors import KafkaConnector
-from factory import settings
-import asyncio
-import random
+import logging
+
+logger = logging.getLogger('AioETL')
 
 class FeedPipeline(metaclass=MetaPipeline):
     '''feed pipeline is for middleware chain feed
@@ -31,13 +31,12 @@ class KafkaFeedPipeline(FeedPipeline):
         self.pipeline = KafkaConnector(topic)
         self.feed_queue = queue
         await self.pipeline.start_consumer()
+        logger.info('Feed pipeline {} listening'.format(self.__class__.__name__))
         try:
             async for msg in self.pipeline.consumer:
                 await self.feed_queue.put(msg.value)
-                print(msg.value)
 
         finally:
-            # Will leave consumer group; perform autocommit if enabled.
             await self.pipeline.consumer.stop()
 
     async def stop(self):

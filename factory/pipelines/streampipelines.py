@@ -3,6 +3,9 @@ from factory.connectors.connectors import KafkaConnector
 from factory import settings
 import asyncio
 import random
+import logging
+
+logger = logging.getLogger('AioETL')
 
 class StreamPipeline(metaclass=MetaPipeline):
     '''stream pipeline is for transfer results after middleware chain or logger
@@ -31,10 +34,10 @@ class KafkaStreamPipeline(StreamPipeline):
         self.pipeline = KafkaConnector(topic)
         self.stream_queue = queue
         await self.pipeline.start_producer()
+        logger.info('Stream pipeline {} ready'.format(self.__class__.__name__))
         while True:
             m = await self.stream_queue.get()
             if m is None: break
-            print('sending_msg', m)
             await self.pipeline.producer.send(settings.STREAM_TOPIC, value=m)
             await self.pipeline.producer.flush()
 

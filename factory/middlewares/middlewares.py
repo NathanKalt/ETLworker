@@ -1,3 +1,4 @@
+import  math
 
 class BaseMiddleware:
 
@@ -29,5 +30,8 @@ class SampleMiddlewareTwo(BaseMiddleware):
 
     def process(self, m):
         self.m = m
-        m['sqaredprocessed'] = m['processed']**2
+        s = 0
+        for i in range(m['processed']+1):
+            s += math.pi*m['processed']**0.5/math.log10(m['processed'])
+        m['sqaredprocessed'] = s
         return m

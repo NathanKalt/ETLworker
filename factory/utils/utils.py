@@ -1,4 +1,5 @@
 from importlib import import_module
+import logging
 import re
 
 def prepare_module(path):
@@ -18,6 +19,20 @@ def get_middleware_chain(settings):
     for path in settings.MIDDLEWARES:
         m, name = prepare_module(path)
         mw_chain.append(getattr(m, name)())
-
-    # print(methods_chain)
     return mw_chain
+
+def get_app_logger(settings=None):
+    logger = logging.getLogger('AioETL')
+    logger.setLevel(logging.INFO)
+    logging.getLogger("aiokafka").setLevel(logging.ERROR)
+    level = logging.INFO
+
+    if settings.LOG_LEVEL == 'DEBUG':
+        level = logging.DEBUG
+
+    logging.basicConfig(
+        format='%(asctime)s %(levelname)-8s %(message)s',
+        level=level,
+        datefmt='%Y-%m-%d %H:%M:%S')
+
+    return logger
